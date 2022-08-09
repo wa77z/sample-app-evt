@@ -21,7 +21,7 @@
  $ aws --version
  ````
 
-### Install Git
+### Install Git, Clone Repo
 
  https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
@@ -29,6 +29,10 @@
  $ git version
  ````
 
+ ````
+ $ git clone https://github.com/wa77z/sample-app-evt.git
+ ````
+ 
 ### Create an AWS Account
 
  https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
@@ -55,12 +59,33 @@
  $ cat ~/.ssh/id_rsa.pub
  ````
 
-#### Setup AWS Env Vars from IAM User
+#### Setup AWS Env Vars
  
  https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
+ Verify Credentials and Account
  ````
  $ aws sts get-caller-identity
  ````
 
-#### 
+ Export (3) Vars for AWS resources
+ ````
+ $ export VPC_ID=vpc-ff683085
+ $ export KEY_PAIR=wa77z
+ $ export SUBNET=subnet-39bab365
+ ````
+
+### Export Ansible Env Vars
+
+ ````
+ $ export ANSIBLE_HOST_KEY_CHECKING=False
+ ````
+ 
+## Run Ansible Playbooks
+
+ ````
+ $ ansible-playbook all-in-one.yaml -v
+ ````
+
+
+
