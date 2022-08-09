@@ -30,19 +30,21 @@
  ````
 
  ````
+ $ cd ~
  $ git clone https://github.com/wa77z/sample-app-evt.git
+ $ cd sample-app-evt
  ````
  
 ### Create an AWS Account
 
  https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
 
-#### Create an IAM user w/ Security Credentials
+### Create an IAM user w/ Security Credentials
  
  https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html
 
 
-#### Create and Import an SSH key pair
+### Create and Import an SSH key pair
 
  https://docs.aws.amazon.com/cli/latest/reference/ec2/import-key-pair.html
  
@@ -54,12 +56,12 @@
  $ ssh-keygen -t rsa -b 2048
  $ [enter]
  $ [enter]
- $ cd ~/
+ $ cd ~/sample-app-evt/
 
  $ cat ~/.ssh/id_rsa.pub
  ````
 
-#### Setup AWS Env Vars
+### Setup AWS Env Vars
  
  https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
@@ -81,7 +83,7 @@
  $ export ANSIBLE_HOST_KEY_CHECKING=False
  ````
  
-## Run Ansible Playbooks
+## Run Ansible Playbook
 
  ````
  $ ansible-playbook all-in-one.yaml -v
