@@ -4,7 +4,7 @@
   tasks:
   - amazon.aws.ec2_group:
       name: webserver
-      description: sg with rule descriptions
+      description: allows http and ssh
       vpc_id: "{{ lookup('ansible.builtin.env', 'VPC_ID') }}"
       region: us-east-1
       rules:
@@ -37,12 +37,20 @@
     loop: "{{ ec2.instances }}"
 
   - name: Wait for SSH to come up
-    delegate_to: "{{ item.dns_name }}"
     wait_for_connection:
       delay: 60
       timeout: 320
     loop: "{{ ec2.instances }}" 
-    remote_user: ec2-user 
+    remote_user: ec2-user
+
+  - name: persist var across plays
+    set_fact:
+      dns_name: "{{ item.dns_name }}"
+    loop: "{{ ec2.instances }}"
+
+  - name: print the public_dns_name
+    ansible.builtin.debug:
+      msg: URL http://{{ dns_name }}
 
 - name: configure webserver 
   hosts: ec2
@@ -51,7 +59,7 @@
   tasks:
   - name: install httpd
     package:
-      name: "httpd"
+      name: "httpd"  
       state: present
 
   - name: document root directory
@@ -68,3 +76,7 @@
     service:
       name: "httpd"
       state: started   
+
+  - name: Check that you can connect (GET) to a page and it returns a status 200
+    ansible.builtin.uri:
+      url: "http://{{ hostvars['localhost']['dns_name'] }}"
