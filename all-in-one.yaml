@@ -1,0 +1,70 @@
+---
+- name: create ec2 security group, instance, and assign
+  hosts: localhost
+  tasks:
+  - amazon.aws.ec2_group:
+      name: webserver
+      description: sg with rule descriptions
+      vpc_id: vpc-ff683085
+      region: us-east-1
+      rules:
+        - proto: tcp
+          ports:
+          - 80
+          cidr_ip: 0.0.0.0/0
+          rule_desc: allow all on port 80
+        - proto: tcp
+          ports:
+          - 22
+          cidr_ip: 0.0.0.0/0
+          rule_desc: allow all on port 22
+
+  - amazon.aws.ec2:
+      key_name: wa77z
+      instance_type: t2.micro
+      image: ami-06640050dc3f556bb
+      wait: yes
+      group: webserver
+      count: 1
+      vpc_subnet_id: subnet-39bab365
+      assign_public_ip: yes
+    register: ec2
+
+  - name: Add new instance to host group
+    add_host:  
+      hostname: "{{ item.public_ip }}"
+      groupname: ec2
+    loop: "{{ ec2.instances }}"
+
+  - name: Wait for SSH to come up
+    delegate_to: "{{ item.dns_name }}"
+    wait_for_connection:
+      delay: 60
+      timeout: 320
+    loop: "{{ ec2.instances }}" 
+    remote_user: ec2-user 
+
+- name: configure webserver 
+  hosts: ec2
+  remote_user: ec2-user
+  become: yes
+  tasks:
+  - name: install httpd
+    package:
+      name: "httpd"
+      state: present
+
+  - name: document root directory
+    file:
+      state: directory
+      dest: "/var/www/html"
+
+  - name: copy webpage from url
+    get_url:
+      dest: "/var/www/html"
+      url: "https://raw.githubusercontent.com/krrajpurohit/test/master/index.html"
+
+  - name: httpd service start
+    service:
+      name: "httpd"
+      state: started   
